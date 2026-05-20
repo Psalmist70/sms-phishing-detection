@@ -11,7 +11,7 @@ app = Flask(__name__)
 # LOAD MODEL & ARTIFACTS
 # =========================
 
-model = load_model("models/sms_phishing_cnn_lstm.h5")
+model = load_model("models/sms_phishing_cnn_lstm_model.h5")
 tokenizer = joblib.load("artifacts/tokenizer.joblib")
 max_len = joblib.load("artifacts/max_len.joblib")
 
