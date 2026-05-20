@@ -3,7 +3,7 @@ from flask import Flask, request, jsonify
 import numpy as np
 import joblib
 import re
-from tensorflow.keras.preprocessing.sequence import pad_sequences
+from tensorflow.keras.models import load_model
 
 app = Flask(__name__)
 
@@ -11,7 +11,7 @@ app = Flask(__name__)
 # LOAD MODEL & ARTIFACTS
 # =========================
 
-model = joblib.load("models/sms_phishing_cnn_lstm.joblib")
+model = joblib.load("models/sms_phishing_cnn_lstm.h5")
 tokenizer = joblib.load("artifacts/tokenizer.joblib")
 max_len = joblib.load("artifacts/max_len.joblib")
 
