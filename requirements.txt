@@ -1,9 +1,8 @@
-
+flask
 numpy
 pandas
 scikit-learn
 tensorflow
 keras
-matplotlib
-seaborn
-nltk
+joblib
+gunicorn
