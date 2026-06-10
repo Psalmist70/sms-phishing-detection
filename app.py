@@ -3,7 +3,7 @@ from flask import Flask, request, jsonify
 import numpy as np
 import joblib
 import re
-from tensorflow.keras.models import TFSMLayer
+from tensorflow.keras.layers import TFSMLayer
 
 app = Flask(__name__)
 
