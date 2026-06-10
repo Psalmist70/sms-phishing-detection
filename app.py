@@ -3,15 +3,17 @@ from flask import Flask, request, jsonify
 import numpy as np
 import joblib
 import re
-from tensorflow.keras.models import load_model
+from tensorflow.keras.models TFSMLayer
 
 app = Flask(__name__)
 
 # =========================
 # LOAD MODEL & ARTIFACTS
 # =========================
-
-model = load_model("models/saved_model", compile=False)
+model = TFSMLayer(
+    "models/saved_model",
+    call_endpoint="serving_default"
+)
 tokenizer = joblib.load("artifacts/tokenizer.joblib")
 max_len = joblib.load("artifacts/max_len.joblib")
 
