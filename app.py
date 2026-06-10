@@ -11,7 +11,7 @@ app = Flask(__name__)
 # LOAD MODEL & ARTIFACTS
 # =========================
 
-model = load_model("models/model.keras", compile=False)
+model = load_model("models/saved_model", compile=False)
 tokenizer = joblib.load("artifacts/tokenizer.joblib")
 max_len = joblib.load("artifacts/max_len.joblib")
 
