@@ -4,6 +4,7 @@ import numpy as np
 import joblib
 import re
 from tensorflow.keras.layers import TFSMLayer
+from tensorflow.keras.preprocessing.sequence import pad_sequences
 
 app = Flask(__name__)
 
