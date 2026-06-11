@@ -2,4 +2,4 @@ flask
 numpy
 joblib
 gunicorn
-tensorflow==2.20.0
+onnxruntime
