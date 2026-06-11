@@ -37,6 +37,11 @@ def build_model():
 
 
 model = build_model()
+
+# ✅ FORCE BUILD (IMPORTANT FIX)
+model.build(input_shape=(None, max_len))
+
+# now load weights
 model.load_weights("models/model.weights.h5")
 
 
