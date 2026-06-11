@@ -24,12 +24,22 @@ max_len = joblib.load("artifacts/max_len.joblib")
 
 def build_model():
     from tensorflow.keras.models import Sequential
-    from tensorflow.keras.layers import Embedding, Conv1D, LSTM, Dense
+    from tensorflow.keras.layers import Embedding, Conv1D, MaxPooling1D
+    from tensorflow.keras.layers import Bidirectional, LSTM, Dropout, Dense
 
     model = Sequential([
         Embedding(input_dim=10000, output_dim=128, input_length=max_len),
+
         Conv1D(128, 5, activation='relu'),
-        LSTM(64),
+        MaxPooling1D(pool_size=2),
+
+        Conv1D(64, 3, activation='relu'),
+
+        Bidirectional(LSTM(64)),
+
+        Dropout(0.5),
+
+        Dense(64, activation='relu'),
         Dense(1, activation='sigmoid')
     ])
 
@@ -38,10 +48,10 @@ def build_model():
 
 model = build_model()
 
-# ✅ FORCE BUILD (IMPORTANT FIX)
+# IMPORTANT: force build
 model.build(input_shape=(None, max_len))
 
-# now load weights
+# load weights
 model.load_weights("models/model.weights.h5")
 
 
