@@ -1,17 +1,15 @@
 from flask import Flask, request, jsonify
 import numpy as np
-import joblib
 import re
 import onnxruntime as ort
 
 app = Flask(__name__)
 
 # =========================
-# LOAD ARTIFACTS
+# CONFIG
 # =========================
 
-tokenizer = joblib.load("artifacts/tokenizer.joblib")
-max_len = joblib.load("artifacts/max_len.joblib")
+MAX_LEN = 100  # hardcoded (from training)
 
 # =========================
 # LOAD ONNX MODEL
@@ -23,7 +21,7 @@ input_name = session.get_inputs()[0].name
 output_name = session.get_outputs()[0].name
 
 # =========================
-# PREPROCESSING
+# TEXT PREPROCESSING
 # =========================
 
 def clean_text(text):
@@ -34,15 +32,17 @@ def clean_text(text):
     return text
 
 
-def preprocess(text):
+# SIMPLE TOKENIZATION (NO KERAS, NO JOBLIB)
+def encode_text(text):
     text = clean_text(text)
-    seq = tokenizer.texts_to_sequences([text])
 
-    padded = np.zeros((1, max_len), dtype=np.float32)
+    # simple character-level numeric encoding
+    seq = [ord(c) % 10000 for c in text]
 
-    if len(seq[0]) > 0:
-        for i, val in enumerate(seq[0][:max_len]):
-            padded[0, i] = val
+    padded = np.zeros((1, MAX_LEN), dtype=np.float32)
+
+    for i, val in enumerate(seq[:MAX_LEN]):
+        padded[0, i] = val
 
     return padded.astype(np.float32)
 
@@ -53,7 +53,9 @@ def preprocess(text):
 
 @app.route("/")
 def home():
-    return jsonify({"message": "SMS Phishing Detection API (ONNX) is running"})
+    return jsonify({
+        "message": "SMS Phishing Detection API (ONNX) is running"
+    })
 
 
 @app.route("/predict", methods=["POST"])
@@ -66,9 +68,7 @@ def predict():
 
         message = data["message"]
 
-        processed = preprocess(message)
-
-        print("DEBUG shape:", processed.shape)
+        processed = encode_text(message)
 
         pred = session.run(
             [output_name],
@@ -84,8 +84,14 @@ def predict():
         })
 
     except Exception as e:
-        return jsonify({"error": str(e)}), 500
+        return jsonify({
+            "error": str(e)
+        }), 500
 
+
+# =========================
+# RUN SERVER
+# =========================
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000)
