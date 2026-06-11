@@ -3,8 +3,11 @@ import numpy as np
 import re
 import json
 import onnxruntime as ort
+from flask_cors import CORS
 
 app = Flask(__name__)
+CORS(app)
+
 
 print("STEP 1 - Flask initialized")
 
