@@ -4,6 +4,12 @@ import numpy as np
 import joblib
 import re
 from tensorflow.keras.models import load_model
+import tensorflow as tf
+import keras
+
+print("TensorFlow:", tf.__version__)
+print("Keras:", keras.__version__)
+
 
 app = Flask(__name__)
 
