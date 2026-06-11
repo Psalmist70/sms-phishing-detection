@@ -16,15 +16,18 @@ import re
 
 import tensorflow as tf
 print("STEP 5 - TensorFlow imported")
+tf.config.threading.set_intra_op_parallelism_threads(1)
+tf.config.threading.set_inter_op_parallelism_threads(1)
 
 import keras
 print("STEP 6 - Keras imported")
+import time
+import traceback
 
 from tensorflow.keras.preprocessing.sequence import pad_sequences
 print("STEP 7 - pad_sequences imported")
 
-print("TensorFlow:", tf.__version__)
-print("Keras:", keras.__version__)
+
 
 app = Flask(__name__)
 
@@ -140,35 +143,49 @@ def preprocess(text):
 
 @app.route("/")
 def home():
-    return jsonify({
-        "message": "SMS Phishing Detection API is running"
-    })
+    print("DEBUG: GET / hit")
+    return jsonify({"message": "API running"})
 
 
 @app.route("/predict", methods=["POST"])
 def predict():
+    try:
+        print("DEBUG: /predict started")
+        start = time.time()
 
-    data = request.get_json()
+        data = request.get_json()
+        print("DEBUG: payload received:", data)
 
-    if not data or "message" not in data:
+        if not data or "message" not in data:
+            print("DEBUG: missing message")
+            return jsonify({"error": "No message provided"}), 400
+
+        message = data["message"]
+        print("DEBUG: message =", message)
+
+        print("DEBUG: preprocessing start")
+        processed = preprocess(message)
+        print("DEBUG: preprocessing done")
+
+        print("DEBUG: model prediction start")
+        pred = model.predict(processed, verbose=0)[0][0]
+        print("DEBUG: prediction done")
+
+        label = "Phishing" if pred > 0.5 else "Legitimate"
+
+        end = time.time()
+        print(f"DEBUG: total time = {end - start:.2f}s")
+
         return jsonify({
-            "error": "No message provided"
-        }), 400
+            "message": message,
+            "prediction_score": float(pred),
+            "result": label
+        })
 
-    message = data["message"]
-
-    processed = preprocess(message)
-
-    pred = float(model.predict(processed, verbose=0)[0][0])
-
-    label = "Phishing" if pred > 0.5 else "Legitimate"
-
-    return jsonify({
-        "message": message,
-        "prediction_score": pred,
-        "result": label
-    })
-
+    except Exception as e:
+        print("ERROR OCCURRED:")
+        print(traceback.format_exc())
+        return jsonify({"error": str(e)}), 500
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000)
